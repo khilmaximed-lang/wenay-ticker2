@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wenay Ticker</title>
+<style>
+  body {
+    margin: 0;
+    background: transparent;
+    overflow: hidden;
+    font-family: Arial, sans-serif;
+  }
+
+  #ticker {
+    display: flex;
+    align-items: center;
+    height: 80px;
+    white-space: nowrap;
+    animation: scroll 30s linear infinite;
+  }
+
+  .ticker-item {
+    display: inline-block;
+    padding: 0 50px;
+    font-size: 28px;
+    color: #FF4B4B; /* красные акценты Wenay */
+  }
+
+  @keyframes scroll {
+    0% { transform: translateX(100%); }
+    100% { transform: translateX(-100%); }
+  }
+</style>
+</head>
+<body>
+<div id="ticker">
+  <div class="ticker-item">BTCUSD: <span id="BTCUSD">...</span></div>
+  <div class="ticker-item">ETHUSD: <span id="ETHUSD">...</span></div>
+  <div class="ticker-item">USDRUB: <span id="USDRUB">...</span></div>
+  <div class="ticker-item">SP500: <span id="SP500">...</span></div>
+  <div class="ticker-item">QQQ: <span id="QQQ">...</span></div>
+  <div class="ticker-item">XAUUSD: <span id="XAUUSD">...</span></div>
+</div>
+
+<script>
+async function fetchPrice(symbol) {
+  try {
+    const response = await fetch(`https://api.binance.com/api/v3/ticker/price?symbol=${symbol}`);
+    const data = await response.json();
+    return parseFloat(data.price).toFixed(2);
+  } catch(e) {
+    return "...";
+  }
+}
+
+async function fetchData() {
+  const prices = {
+    BTCUSD: await fetchPrice('BTCUSDT'),
+    ETHUSD: await fetchPrice('ETHUSDT'),
+    USDRUB: await fetchPrice('USDRUBTRY') // пример для RUB (можно изменить источник)
+  };
+
+  // Для индексов и золота используем фиктивные данные, пока нет прямого API
+  prices.SP500 = (4500 + Math.random()*50).toFixed(2);
+  prices.QQQ = (380 + Math.random()*5).toFixed(2);
+  prices.XAUUSD = (1950 + Math.random()*10).toFixed(2);
+
+  for (const key in prices) {
+    document.getElementById(key).textContent = prices[key];
+  }
+}
+
+// Обновляем каждые 5 секунд
+setInterval(fetchData, 5000);
+fetchData();
+</script>
+</body>
+</html>
